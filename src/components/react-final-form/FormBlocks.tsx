@@ -14,7 +14,9 @@ export interface FormBlocksProps {
 export const FormBlocks = ({config}: FormBlocksProps) => {
     const form = useForm<FormFieldsValues>();
     const {values} = useFormState<FormFieldsValues>();
-    const {fields} = useFieldArray<FormFieldsValues['blocks']>(`blocks`);
+    const {fields} = useFieldArray<FormFieldsValues['blocks']>(`blocks`, {
+        subscription: {submitting: true, pristine: true},
+    });
 
     return (
         <div>

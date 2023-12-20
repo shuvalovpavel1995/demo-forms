@@ -22,6 +22,7 @@ export interface FormBlockProps {
 export const FormBlock = ({name, config, blockIndex, remove}: FormBlockProps) => {
     const {fields} = useFieldArray<K8sConfiguration | ComputeConfiguration>(
         `${name}.configurations`,
+        {subscription: {submitting: true, pristine: true}},
     );
     const form = useForm<FormFieldsValues>();
 

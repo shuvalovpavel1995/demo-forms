@@ -50,6 +50,7 @@ export const Form = React.forwardRef<FormProps>(function FormComponent() {
             mutators={{
                 ...arrayMutators,
             }}
+            subscription={{submitting: true, pristine: true}}
             render={({handleSubmit}) => {
                 return (
                     <form onSubmit={handleSubmit}>

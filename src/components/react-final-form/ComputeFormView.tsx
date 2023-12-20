@@ -76,7 +76,9 @@ const ComputeFormFields = ({
         [platforms, platform],
     );
 
-    const {fields} = useFieldArray<Option>(`${fieldName}.disks`);
+    const {fields} = useFieldArray<Option>(`${fieldName}.disks`, {
+        subscription: {submitting: true, pristine: true},
+    });
 
     const gpuCoresOptions = useMemo(
         () =>
