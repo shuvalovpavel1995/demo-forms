@@ -1,4 +1,4 @@
-import React, {Fragment, useMemo} from 'react';
+import React, {Fragment, useCallback, useMemo} from 'react';
 
 import {useForm, Field, useField, FieldRenderProps} from 'react-final-form';
 import {Button, Card, Checkbox, RadioButton, Select, TextInput} from '@gravity-ui/uikit';
@@ -16,6 +16,8 @@ import {
     osAvaliable,
     required,
 } from '../utils/validators';
+import {FieldState} from 'final-form';
+import _ from 'lodash';
 
 const b = block('form-block');
 
@@ -85,6 +87,36 @@ const ComputeFormFields = ({
                 }),
             ),
         [platform, platforms],
+    );
+
+    const memoryValidate = useCallback(
+        (value: string, allValues: FormFieldsValues, state: FieldState<string>) => {
+            const path = state.name?.replace('.memory', '');
+            const values = _.get(allValues, path);
+
+            if (
+                (Number(value) < 0 || Number(value) > 500) &&
+                values.platform?.includes('gpu-h100')
+            ) {
+                return 'Only 0-500 avaliable for gpu-h100 platform';
+            }
+
+            if (
+                (Number(value) < 500 || Number(value) > 1000) &&
+                values.platform?.includes('gpu-standard-v3')
+            ) {
+                return 'Only 500-1000 avaliable for gpu-standard-v3 platform';
+            }
+
+            if (
+                (Number(value) < 1000 || Number(value) > 5000) &&
+                values.platform?.includes('standard-v2')
+            ) {
+                return 'Only 1000-5000 avaliable for gpu-standard-v3 platform';
+            }
+            return undefined;
+        },
+        [],
     );
 
     return (
@@ -175,10 +207,7 @@ const ComputeFormFields = ({
             </div>
             <div>
                 Memory&nbsp;
-                <Field
-                    name={`${fieldName}.memory`}
-                    validate={composeValidators(required, mustBeNumber, minValue(1))}
-                >
+                <Field name={`${fieldName}.memory`} validate={memoryValidate}>
                     {(fieldProps: FieldRenderProps<string, HTMLElement, string>) => (
                         <Fragment>
                             <TextInput

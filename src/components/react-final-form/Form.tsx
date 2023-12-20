@@ -5,7 +5,6 @@ import createDecorator from 'final-form-calculate';
 
 import {computeConfig} from '../../mocks/configs';
 import {FormBlocks} from './FormBlocks';
-import {FormFieldsValues} from './ComputeFormView';
 
 export interface FormProps {}
 
@@ -34,7 +33,7 @@ export const Form = React.forwardRef<FormProps>(function FormComponent() {
                 [`${fieldPath}.coreFraction`]: '100',
                 [`${fieldPath}.gpuCores`]: '1',
                 [`${fieldPath}.cores`]: '20',
-                [`${fieldPath}.memory`]: '1073741824',
+                [`${fieldPath}.memory`]: '500',
                 [`${fieldPath}.preemptible`]: true,
             };
         },
