@@ -1,0 +1,11 @@
+@use '../variables';
+@use '@gravity-ui/uikit/styles/mixins';
+
+$block: '.#{variables.$ns}form-block';
+
+#{$block} {
+    &__card {
+        margin: 10px;
+        padding: 10px;
+    }
+}
