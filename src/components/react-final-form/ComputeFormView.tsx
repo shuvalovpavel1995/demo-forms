@@ -1,6 +1,6 @@
-import React, {useMemo} from 'react';
+import React, {Fragment, useMemo} from 'react';
 
-import {useForm, Field, useField} from 'react-final-form';
+import {useForm, Field, useField, FieldRenderProps} from 'react-final-form';
 import {Button, Card, Checkbox, RadioButton, Select, TextInput} from '@gravity-ui/uikit';
 
 import {useFieldArray} from 'react-final-form-arrays';
@@ -9,6 +9,13 @@ import {block} from '../utils/cn';
 import {computeConfig} from '../../mocks/configs';
 
 import './Form.scss';
+import {
+    composeValidators,
+    minValue,
+    mustBeNumber,
+    osAvaliable,
+    required,
+} from '../utils/validators';
 
 const b = block('form-block');
 
@@ -35,7 +42,7 @@ export interface K8sConfiguration {
     name: string;
 }
 
-export interface ComputeFormFieldsValues {
+export interface FormFieldsValues {
     blocks: {
         configurations: (K8sConfiguration | ComputeConfiguration)[];
     }[];
@@ -48,13 +55,15 @@ export interface ComputeFormFieldsProps {
     diskTypes: Option[];
 }
 
+const ErrorText = ({text}: {text: string}) => <span className={b('error')}>{text}</span>;
+
 const ComputeFormFields = ({
     fieldName,
     platforms,
     osProducts,
     diskTypes,
 }: ComputeFormFieldsProps) => {
-    const form = useForm<ComputeFormFieldsValues>();
+    const form = useForm<FormFieldsValues>();
     const platformInput = useField<string[], HTMLElement, string[]>(`${fieldName}.platform`, form);
     const platform = platformInput.input.value[0];
 
@@ -81,31 +90,41 @@ const ComputeFormFields = ({
     return (
         <React.Fragment>
             <div>
-                osProduct&nbsp;
-                <Field name={`${fieldName}.osProduct`}>
-                    {(fieldProps) => (
-                        <Select
-                            {...fieldProps}
-                            value={fieldProps.input.value}
-                            onUpdate={fieldProps.input.onChange}
-                            options={osProducts}
-                        />
+                OS Product&nbsp;
+                <Field name={`${fieldName}.osProduct`} validate={osAvaliable}>
+                    {(fieldProps: FieldRenderProps<string[], HTMLElement, string[]>) => (
+                        <Fragment>
+                            <Select
+                                {...fieldProps}
+                                value={fieldProps.input.value}
+                                onUpdate={fieldProps.input.onChange}
+                                options={osProducts}
+                            />
+                            {fieldProps.meta.error && !fieldProps.meta.pristine && (
+                                <ErrorText text={fieldProps.meta.error} />
+                            )}
+                        </Fragment>
                     )}
                 </Field>
             </div>
             <div>
                 Platform&nbsp;
-                <Field name={`${fieldName}.platform`}>
-                    {(fieldProps) => (
-                        <Select
-                            {...fieldProps}
-                            value={fieldProps.input.value}
-                            onUpdate={fieldProps.input.onChange}
-                            options={platforms.map(({id: value, name: content}) => ({
-                                content,
-                                value,
-                            }))}
-                        />
+                <Field name={`${fieldName}.platform`} validate={required}>
+                    {(fieldProps: FieldRenderProps<string, HTMLElement, string[]>) => (
+                        <Fragment>
+                            <Select
+                                {...fieldProps}
+                                value={fieldProps.input.value}
+                                onUpdate={fieldProps.input.onChange}
+                                options={platforms.map(({id: value, name: content}) => ({
+                                    content,
+                                    value,
+                                }))}
+                            />
+                            {fieldProps.meta.error && !fieldProps.meta.pristine && (
+                                <ErrorText text={fieldProps.meta.error} />
+                            )}
+                        </Fragment>
                     )}
                 </Field>
             </div>
@@ -113,66 +132,102 @@ const ComputeFormFields = ({
             {gpuPlatforms.includes(platform) && (
                 <div>
                     Gpu Cores&nbsp;
-                    <Field name={`${fieldName}.gpuCores`}>
+                    <Field
+                        name={`${fieldName}.gpuCores`}
+                        validate={composeValidators(required, mustBeNumber, minValue(1))}
+                    >
                         {(fieldProps) => (
-                            <RadioButton
-                                {...fieldProps}
-                                value={fieldProps.input.value}
-                                onUpdate={fieldProps.input.onChange}
-                                options={gpuCoresOptions}
-                            />
+                            <Fragment>
+                                <RadioButton
+                                    {...fieldProps}
+                                    value={fieldProps.input.value}
+                                    onUpdate={fieldProps.input.onChange}
+                                    options={gpuCoresOptions}
+                                />
+
+                                {fieldProps.meta.error && !fieldProps.meta.pristine && (
+                                    <ErrorText text={fieldProps.meta.error} />
+                                )}
+                            </Fragment>
                         )}
                     </Field>
                 </div>
             )}
             <div>
                 Cores&nbsp;
-                <Field name={`${fieldName}.cores`}>
-                    {(fieldProps) => (
-                        <TextInput
-                            {...fieldProps}
-                            value={fieldProps.input.value}
-                            onUpdate={fieldProps.input.onChange}
-                        />
+                <Field
+                    name={`${fieldName}.cores`}
+                    validate={composeValidators(required, mustBeNumber, minValue(1))}
+                >
+                    {(fieldProps: FieldRenderProps<string, HTMLElement, string>) => (
+                        <Fragment>
+                            <TextInput
+                                {...fieldProps}
+                                value={fieldProps.input.value}
+                                onUpdate={fieldProps.input.onChange}
+                            />
+                            {fieldProps.meta.error && !fieldProps.meta.pristine && (
+                                <ErrorText text={fieldProps.meta.error} />
+                            )}
+                        </Fragment>
                     )}
                 </Field>
             </div>
             <div>
                 Memory&nbsp;
-                <Field name={`${fieldName}.memory`}>
-                    {(fieldProps) => (
-                        <TextInput
-                            {...fieldProps}
-                            value={fieldProps.input.value}
-                            onUpdate={fieldProps.input.onChange}
-                        />
+                <Field
+                    name={`${fieldName}.memory`}
+                    validate={composeValidators(required, mustBeNumber, minValue(1))}
+                >
+                    {(fieldProps: FieldRenderProps<string, HTMLElement, string>) => (
+                        <Fragment>
+                            <TextInput
+                                {...fieldProps}
+                                value={fieldProps.input.value}
+                                onUpdate={fieldProps.input.onChange}
+                            />
+                            {fieldProps.meta.error && !fieldProps.meta.pristine && (
+                                <ErrorText text={fieldProps.meta.error} />
+                            )}
+                        </Fragment>
                     )}
                 </Field>
             </div>
             <div>
-                <Field name={`${fieldName}.preemptible`}>
-                    {(fieldProps) => (
-                        <Checkbox
-                            checked={fieldProps.input.value}
-                            size="l"
-                            onUpdate={fieldProps.input.onChange}
-                            disabled={rejectPreemptible}
-                        >
-                            &nbsp;Preemptible&nbsp;
-                        </Checkbox>
+                <Field name={`${fieldName}.preemptible`} validate={required}>
+                    {(fieldProps: FieldRenderProps<boolean, HTMLElement, boolean>) => (
+                        <Fragment>
+                            <Checkbox
+                                checked={fieldProps.input.value}
+                                size="l"
+                                onUpdate={fieldProps.input.onChange}
+                                disabled={rejectPreemptible}
+                            >
+                                &nbsp;Preemptible&nbsp;
+                            </Checkbox>
+                            {fieldProps.meta.error && !fieldProps.meta.pristine && (
+                                <ErrorText text={fieldProps.meta.error} />
+                            )}
+                        </Fragment>
                     )}
                 </Field>
             </div>
             <div>
-                <Field name={`${fieldName}.network`}>
-                    {(fieldProps) => (
-                        <Checkbox
-                            checked={fieldProps.input.value}
-                            size="l"
-                            onUpdate={fieldProps.input.onChange}
-                        >
-                            &nbsp;Network&nbsp;
-                        </Checkbox>
+                <Field name={`${fieldName}.network`} validate={required}>
+                    {(fieldProps: FieldRenderProps<boolean, HTMLElement, boolean>) => (
+                        <Fragment>
+                            <Checkbox
+                                checked={fieldProps.input.value}
+                                size="l"
+                                onUpdate={fieldProps.input.onChange}
+                            >
+                                &nbsp;Network&nbsp;
+                            </Checkbox>
+
+                            {fieldProps.meta.error && !fieldProps.meta.pristine && (
+                                <ErrorText text={fieldProps.meta.error} />
+                            )}
+                        </Fragment>
                     )}
                 </Field>
             </div>
@@ -191,26 +246,37 @@ const ComputeFormFields = ({
                     <Card type="container" view="outlined" key={disk} className={b('card')}>
                         <div>
                             Disk type&nbsp;
-                            <Field name={`${disk}.type`}>
-                                {(fieldProps) => (
-                                    <Select
-                                        {...fieldProps}
-                                        value={fieldProps.input.value}
-                                        onUpdate={fieldProps.input.onChange}
-                                        options={diskTypes}
-                                    />
+                            <Field name={`${disk}.type`} validate={required}>
+                                {(fieldProps: FieldRenderProps<string, HTMLElement, string[]>) => (
+                                    <Fragment>
+                                        <Select
+                                            {...fieldProps}
+                                            value={fieldProps.input.value}
+                                            onUpdate={fieldProps.input.onChange}
+                                            options={diskTypes}
+                                        />
+                                        {fieldProps.meta.error && !fieldProps.meta.pristine && (
+                                            <ErrorText text={fieldProps.meta.error} />
+                                        )}
+                                    </Fragment>
                                 )}
                             </Field>
                         </div>
                         <div>
                             Disk size&nbsp;
-                            <Field name={`${disk}.size`}>
-                                {(fieldProps) => (
-                                    <TextInput
-                                        {...fieldProps}
-                                        value={fieldProps.input.value}
-                                        onUpdate={fieldProps.input.onChange}
-                                    />
+                            <Field name={`${disk}.size`} validate={required}>
+                                {(fieldProps: FieldRenderProps<string, HTMLElement, string>) => (
+                                    <Fragment>
+                                        <TextInput
+                                            {...fieldProps}
+                                            value={fieldProps.input.value}
+                                            onUpdate={fieldProps.input.onChange}
+                                        />
+
+                                        {fieldProps.meta.error && !fieldProps.meta.pristine && (
+                                            <ErrorText text={fieldProps.meta.error} />
+                                        )}
+                                    </Fragment>
                                 )}
                             </Field>
                         </div>

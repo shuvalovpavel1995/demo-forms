@@ -5,6 +5,7 @@ import createDecorator from 'final-form-calculate';
 
 import {computeConfig} from '../../mocks/configs';
 import {FormBlocks} from './FormBlocks';
+import {FormFieldsValues} from './ComputeFormView';
 
 export interface FormProps {}
 

@@ -6,7 +6,7 @@ import {useForm} from 'react-final-form';
 import {Configuration} from './Configuration';
 import {block} from '../utils/cn';
 import {computeConfig} from '../../mocks/configs';
-import {ComputeConfiguration, ComputeFormFieldsValues, K8sConfiguration} from './ComputeFormView';
+import {ComputeConfiguration, FormFieldsValues, K8sConfiguration} from './ComputeFormView';
 
 import './Form.scss';
 
@@ -23,7 +23,7 @@ export const FormBlock = ({name, config, blockIndex, remove}: FormBlockProps) =>
     const {fields} = useFieldArray<K8sConfiguration | ComputeConfiguration>(
         `${name}.configurations`,
     );
-    const form = useForm<ComputeFormFieldsValues>();
+    const form = useForm<FormFieldsValues>();
 
     return (
         <Card

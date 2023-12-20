@@ -8,4 +8,8 @@ $block: '.#{variables.$ns}form-block';
         margin: 10px;
         padding: 10px;
     }
+
+    &__error {
+        color: var(--g-color-text-danger);
+    }
 }

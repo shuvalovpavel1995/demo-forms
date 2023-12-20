@@ -5,16 +5,16 @@ import {Button} from '@gravity-ui/uikit';
 
 import {FormBlock} from './FormBlock';
 import {computeConfig} from '../../mocks/configs';
-import {ComputeFormFieldsValues} from './ComputeFormView';
+import {FormFieldsValues} from './ComputeFormView';
 
 export interface FormBlocksProps {
     config: typeof computeConfig;
 }
 
 export const FormBlocks = ({config}: FormBlocksProps) => {
-    const form = useForm<ComputeFormFieldsValues>();
-    const {values} = useFormState<ComputeFormFieldsValues>();
-    const {fields} = useFieldArray<ComputeFormFieldsValues['blocks']>(`blocks`);
+    const form = useForm<FormFieldsValues>();
+    const {values} = useFormState<FormFieldsValues>();
+    const {fields} = useFieldArray<FormFieldsValues['blocks']>(`blocks`);
 
     return (
         <div>
