@@ -5,7 +5,7 @@ import type {Meta, StoryObj} from '@storybook/react';
 import {Form} from '../Form';
 
 export default {
-    title: 'ReactFinalForm',
+    title: 'ReactHookForm',
     component: Form,
 } as Meta;
 

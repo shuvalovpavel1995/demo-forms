@@ -1,14 +1,14 @@
 import React, {Fragment, useCallback, useMemo} from 'react';
 
-import {useForm, Field, useField, FieldRenderProps} from 'react-final-form';
 import {Button, Card, Checkbox, RadioButton, Select, TextInput} from '@gravity-ui/uikit';
-
+import {FieldState} from 'final-form';
+import _ from 'lodash';
+import {Field, FieldRenderProps, useField, useForm} from 'react-final-form';
 import {useFieldArray} from 'react-final-form-arrays';
 
-import {block} from '../utils/cn';
 import {computeConfig} from '../../mocks/configs';
-
-import './Form.scss';
+import {FormFieldsValues, Option} from '../../types';
+import {block} from '../utils/cn';
 import {
     composeValidators,
     minValue,
@@ -16,39 +16,10 @@ import {
     osAvaliable,
     required,
 } from '../utils/validators';
-import {FieldState} from 'final-form';
-import _ from 'lodash';
+
+import './Form.scss';
 
 const b = block('form-block');
-
-interface Option {
-    value: string;
-    content: string;
-}
-
-export interface ComputeConfiguration {
-    type: 'compute';
-    osProduct: string;
-    platform: string;
-    cores: number;
-    gpuCores?: number;
-    memory: number;
-    preemptible?: boolean;
-    network?: boolean;
-    traffic: number;
-    disks: Option[];
-}
-
-export interface K8sConfiguration {
-    type: 'k8s';
-    name: string;
-}
-
-export interface FormFieldsValues {
-    blocks: {
-        configurations: (K8sConfiguration | ComputeConfiguration)[];
-    }[];
-}
 
 export interface ComputeFormFieldsProps {
     fieldName: string;

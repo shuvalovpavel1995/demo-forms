@@ -1,7 +1,7 @@
 import React from 'react';
 
-import {Card, TextInput} from '@gravity-ui/uikit';
-import {Field, useField, useForm} from 'react-final-form';
+import {Card} from '@gravity-ui/uikit';
+import {useFormContext} from 'react-hook-form';
 
 import {computeConfig} from '../../mocks/configs';
 import {FormFieldsValues} from '../../types';
@@ -14,24 +14,24 @@ import './Form.scss';
 const b = block('form-block');
 
 export interface ConfigurationProps {
-    configurationName: string;
+    blockIndex: number;
     configurationIndex: number;
     config: typeof computeConfig;
 }
 
-export const Configuration = ({configurationName, config}: ConfigurationProps) => {
-    const form = useForm<FormFieldsValues>();
-    const typeInput = useField<string, HTMLElement, string>(`${configurationName}.type`, form);
-    const type = typeInput.input.value;
+export const Configuration = ({blockIndex, configurationIndex, config}: ConfigurationProps) => {
+    const {register, getValues} = useFormContext<FormFieldsValues>();
+    const type = getValues(`blocks.${blockIndex}.configurations.${configurationIndex}`).type;
 
     return (
-        <Card type="container" view="outlined" key={configurationName} className={b('card')}>
+        <Card type="container" view="outlined" className={b('card')}>
             {type === 'compute' ? (
                 <div>
                     Compute
                     <div>
                         <ComputeFormView
-                            fieldName={configurationName}
+                            blockIndex={blockIndex}
+                            configurationIndex={configurationIndex}
                             platforms={config.platforms}
                             osProducts={config.osProducts}
                             diskTypes={config.diskTypes}
@@ -43,15 +43,13 @@ export const Configuration = ({configurationName, config}: ConfigurationProps) =
                     K8S
                     <div>
                         Name&nbsp;
-                        <Field name={`${configurationName}.name`}>
-                            {(fieldProps) => (
-                                <TextInput
-                                    {...fieldProps}
-                                    value={fieldProps.input.value}
-                                    onUpdate={fieldProps.input.onChange}
-                                />
+                        <input
+                            placeholder="Name"
+                            {...register(
+                                `blocks.${blockIndex}.configurations.${configurationIndex}.name`,
+                                {required: true},
                             )}
-                        </Field>
+                        />
                     </div>
                 </div>
             )}

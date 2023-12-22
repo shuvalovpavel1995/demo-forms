@@ -1,11 +1,13 @@
 import React from 'react';
-import {useFieldArray} from 'react-final-form-arrays';
-import {useForm, useFormState} from 'react-final-form';
+
 import {Button} from '@gravity-ui/uikit';
+import {useForm, useFormState} from 'react-final-form';
+import {useFieldArray} from 'react-final-form-arrays';
+
+import {computeConfig} from '../../mocks/configs';
+import {FormFieldsValues} from '../../types';
 
 import {FormBlock} from './FormBlock';
-import {computeConfig} from '../../mocks/configs';
-import {FormFieldsValues} from './ComputeFormView';
 
 export interface FormBlocksProps {
     config: typeof computeConfig;

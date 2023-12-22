@@ -1,14 +1,15 @@
 import React, {useEffect, useState} from 'react';
-import {Form as FinalForm} from 'react-final-form';
+
 import arrayMutators from 'final-form-arrays';
 import createDecorator from 'final-form-calculate';
+import {Form as FinalForm} from 'react-final-form';
 
 import {computeConfig} from '../../mocks/configs';
+import {sleep} from '../utils/validators';
+
 import {FormBlocks} from './FormBlocks';
 
 export interface FormProps {}
-
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const onSubmit = async (values: Record<string, unknown>) => {
     await sleep(300);
