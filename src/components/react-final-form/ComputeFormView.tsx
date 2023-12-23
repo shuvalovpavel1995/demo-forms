@@ -28,8 +28,6 @@ export interface ComputeFormFieldsProps {
     diskTypes: Option[];
 }
 
-const ErrorText = ({text}: {text: string}) => <span className={b('error')}>{text}</span>;
-
 const ComputeFormFields = ({
     fieldName,
     platforms,
@@ -97,19 +95,23 @@ const ComputeFormFields = ({
             <div>
                 OS Product&nbsp;
                 <Field name={`${fieldName}.osProduct`} validate={osAvaliable}>
-                    {(fieldProps: FieldRenderProps<string[], HTMLElement, string[]>) => (
-                        <Fragment>
-                            <Select
-                                {...fieldProps}
-                                value={fieldProps.input.value}
-                                onUpdate={fieldProps.input.onChange}
-                                options={osProducts}
-                            />
-                            {fieldProps.meta.error && !fieldProps.meta.pristine && (
-                                <ErrorText text={fieldProps.meta.error} />
-                            )}
-                        </Fragment>
-                    )}
+                    {(fieldProps: FieldRenderProps<string[], HTMLElement, string[]>) => {
+                        return (
+                            <Fragment>
+                                <Select
+                                    {...fieldProps}
+                                    value={fieldProps.input.value}
+                                    onUpdate={fieldProps.input.onChange}
+                                    options={osProducts}
+                                    error={
+                                        fieldProps.meta.error &&
+                                        !fieldProps.meta.pristine &&
+                                        fieldProps.meta.error[0]
+                                    }
+                                />
+                            </Fragment>
+                        );
+                    }}
                 </Field>
             </div>
             <div>
@@ -125,10 +127,12 @@ const ComputeFormFields = ({
                                     content,
                                     value,
                                 }))}
+                                error={
+                                    fieldProps.meta.error &&
+                                    !fieldProps.meta.pristine &&
+                                    fieldProps.meta.error[0]
+                                }
                             />
-                            {fieldProps.meta.error && !fieldProps.meta.pristine && (
-                                <ErrorText text={fieldProps.meta.error} />
-                            )}
                         </Fragment>
                     )}
                 </Field>
@@ -137,10 +141,7 @@ const ComputeFormFields = ({
             {gpuPlatforms.includes(platform) && (
                 <div>
                     Gpu Cores&nbsp;
-                    <Field
-                        name={`${fieldName}.gpuCores`}
-                        validate={composeValidators(required, mustBeNumber, minValue(1))}
-                    >
+                    <Field name={`${fieldName}.gpuCores`} validate={required}>
                         {(fieldProps) => (
                             <Fragment>
                                 <RadioButton
@@ -151,7 +152,7 @@ const ComputeFormFields = ({
                                 />
 
                                 {fieldProps.meta.error && !fieldProps.meta.pristine && (
-                                    <ErrorText text={fieldProps.meta.error} />
+                                    <span className={b('error')}>{fieldProps.meta.error}</span>
                                 )}
                             </Fragment>
                         )}
@@ -170,10 +171,9 @@ const ComputeFormFields = ({
                                 {...fieldProps}
                                 value={fieldProps.input.value}
                                 onUpdate={fieldProps.input.onChange}
+                                error={fieldProps.meta.error && !fieldProps.meta.pristine}
+                                errorMessage={fieldProps.meta.error}
                             />
-                            {fieldProps.meta.error && !fieldProps.meta.pristine && (
-                                <ErrorText text={fieldProps.meta.error} />
-                            )}
                         </Fragment>
                     )}
                 </Field>
@@ -187,16 +187,15 @@ const ComputeFormFields = ({
                                 {...fieldProps}
                                 value={fieldProps.input.value}
                                 onUpdate={fieldProps.input.onChange}
+                                error={fieldProps.meta.error && !fieldProps.meta.pristine}
+                                errorMessage={fieldProps.meta.error}
                             />
-                            {fieldProps.meta.error && !fieldProps.meta.pristine && (
-                                <ErrorText text={fieldProps.meta.error} />
-                            )}
                         </Fragment>
                     )}
                 </Field>
             </div>
             <div>
-                <Field name={`${fieldName}.preemptible`} validate={required}>
+                <Field name={`${fieldName}.preemptible`}>
                     {(fieldProps: FieldRenderProps<boolean, HTMLElement, boolean>) => (
                         <Fragment>
                             <Checkbox
@@ -207,15 +206,12 @@ const ComputeFormFields = ({
                             >
                                 &nbsp;Preemptible&nbsp;
                             </Checkbox>
-                            {fieldProps.meta.error && !fieldProps.meta.pristine && (
-                                <ErrorText text={fieldProps.meta.error} />
-                            )}
                         </Fragment>
                     )}
                 </Field>
             </div>
             <div>
-                <Field name={`${fieldName}.network`} validate={required}>
+                <Field name={`${fieldName}.network`}>
                     {(fieldProps: FieldRenderProps<boolean, HTMLElement, boolean>) => (
                         <Fragment>
                             <Checkbox
@@ -225,10 +221,6 @@ const ComputeFormFields = ({
                             >
                                 &nbsp;Network&nbsp;
                             </Checkbox>
-
-                            {fieldProps.meta.error && !fieldProps.meta.pristine && (
-                                <ErrorText text={fieldProps.meta.error} />
-                            )}
                         </Fragment>
                     )}
                 </Field>
@@ -256,10 +248,12 @@ const ComputeFormFields = ({
                                             value={fieldProps.input.value}
                                             onUpdate={fieldProps.input.onChange}
                                             options={diskTypes}
+                                            error={
+                                                fieldProps.meta.error &&
+                                                !fieldProps.meta.pristine &&
+                                                fieldProps.meta.error[0]
+                                            }
                                         />
-                                        {fieldProps.meta.error && !fieldProps.meta.pristine && (
-                                            <ErrorText text={fieldProps.meta.error} />
-                                        )}
                                     </Fragment>
                                 )}
                             </Field>
@@ -273,11 +267,11 @@ const ComputeFormFields = ({
                                             {...fieldProps}
                                             value={fieldProps.input.value}
                                             onUpdate={fieldProps.input.onChange}
+                                            error={
+                                                fieldProps.meta.error && !fieldProps.meta.pristine
+                                            }
+                                            errorMessage={fieldProps.meta.error}
                                         />
-
-                                        {fieldProps.meta.error && !fieldProps.meta.pristine && (
-                                            <ErrorText text={fieldProps.meta.error} />
-                                        )}
                                     </Fragment>
                                 )}
                             </Field>

@@ -6,14 +6,17 @@ export interface Option {
 export interface ComputeConfiguration {
     type: 'compute';
     osProduct: string[];
-    platform: string;
-    cores: number;
+    platform: string[];
+    cores: string;
     gpuCores?: number;
-    memory: number;
+    memory: string;
     preemptible?: boolean;
     network?: boolean;
     traffic: number;
-    disks: Option[];
+    disks: {
+        type: string[];
+        size: string;
+    }[];
 }
 
 export interface K8sConfiguration {

@@ -1,7 +1,7 @@
 import React from 'react';
 
-import {Card} from '@gravity-ui/uikit';
-import {useFormContext} from 'react-hook-form';
+import {Card, TextInput} from '@gravity-ui/uikit';
+import {Controller, useFormContext} from 'react-hook-form';
 
 import {computeConfig} from '../../mocks/configs';
 import {FormFieldsValues} from '../../types';
@@ -20,7 +20,7 @@ export interface ConfigurationProps {
 }
 
 export const Configuration = ({blockIndex, configurationIndex, config}: ConfigurationProps) => {
-    const {register, getValues} = useFormContext<FormFieldsValues>();
+    const {register, control, getValues} = useFormContext<FormFieldsValues>();
     const type = getValues(`blocks.${blockIndex}.configurations.${configurationIndex}`).type;
 
     return (
@@ -43,12 +43,16 @@ export const Configuration = ({blockIndex, configurationIndex, config}: Configur
                     K8S
                     <div>
                         Name&nbsp;
-                        <input
-                            placeholder="Name"
-                            {...register(
-                                `blocks.${blockIndex}.configurations.${configurationIndex}.name`,
-                                {required: true},
+                        <Controller
+                            render={({field}) => (
+                                <TextInput
+                                    {...field}
+                                    value={field.value}
+                                    onUpdate={field.onChange}
+                                />
                             )}
+                            control={control}
+                            name={`blocks.${blockIndex}.configurations.${configurationIndex}.name`}
                         />
                     </div>
                 </div>
