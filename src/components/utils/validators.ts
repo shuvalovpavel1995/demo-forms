@@ -1,6 +1,6 @@
-const simpleMemoize = (fn: (arg?: string[]) => Promise<string[] | undefined>) => {
+export const simpleMemoize = (fn: (arg?: string[]) => Promise<string[] | string | undefined>) => {
     let lastArg: string[] | undefined;
-    let lastResult: Promise<string[] | undefined>;
+    let lastResult: Promise<string[] | string | undefined>;
     return (arg?: string[]) => {
         if (arg?.[0] !== lastArg?.[0]) {
             lastArg = arg;
@@ -32,14 +32,9 @@ export const osAvaliable = simpleMemoize(async (value?: string[]) => {
 });
 
 export const composeValidators =
-    (...validators: ((value: unknown) => string | undefined | Promise<string | undefined>)[]) =>
+    (...validators: ((value: unknown) => string | undefined)[]) =>
     (value: unknown) =>
-        validators.reduce<
-            Record<string, unknown> | string | undefined | Promise<string | undefined>
-        >(
-            (
-                error: Record<string, unknown> | string | undefined | Promise<string | undefined>,
-                validator,
-            ) => error || validator(value),
+        validators.reduce<string | undefined>(
+            (error: string | undefined, validator) => error || validator(value),
             undefined,
         );

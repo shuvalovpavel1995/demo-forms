@@ -1,14 +1,31 @@
-import React from 'react';
+import React, {useCallback, useEffect} from 'react';
 
 import {Button, Card, Checkbox, RadioButton, Select, TextInput} from '@gravity-ui/uikit';
 import _ from 'lodash';
-import {Controller, useFieldArray, useFormContext} from 'react-hook-form';
+import {
+    Controller,
+    FieldError,
+    FieldErrorsImpl,
+    Merge,
+    useFieldArray,
+    useFormContext,
+} from 'react-hook-form';
 
 import {computeConfig} from '../../mocks/configs';
-import {FormFieldsValues, Option} from '../../types';
+import {
+    ComputeConfiguration,
+    DiskType,
+    FormFieldsValues,
+    Option,
+    isComputeConfiguration,
+} from '../../types';
 import {block} from '../utils/cn';
+import {composeValidators, minValue, mustBeNumber, required} from '../utils/validators';
+
+import {osAvaliable} from './utils';
 
 import './Form.scss';
+import {defaultMemoryByPlatform} from '../utils/utils';
 
 const b = block('form-block');
 
@@ -20,8 +37,6 @@ export interface ComputeFormFieldsProps {
     diskTypes: Option[];
 }
 
-const ErrorText = ({text}: {text: string}) => <span className={b('error')}>{text}</span>;
-
 const ComputeFormFields = ({
     blockIndex,
     configurationIndex,
@@ -29,7 +44,12 @@ const ComputeFormFields = ({
     osProducts,
     diskTypes,
 }: ComputeFormFieldsProps) => {
-    const {register, control, getValues} = useFormContext<FormFieldsValues>();
+    const {
+        control,
+        formState: {errors},
+        getValues,
+        resetField,
+    } = useFormContext<FormFieldsValues>();
     const platform = getValues(
         `blocks.${blockIndex}.configurations.${configurationIndex}.platform`,
     )?.[0];
@@ -56,6 +76,61 @@ const ComputeFormFields = ({
         name: `blocks.${blockIndex}.configurations.${configurationIndex}.disks`,
     });
 
+    useEffect(() => {
+        if (platform) {
+            resetField(`blocks.${blockIndex}.configurations.${configurationIndex}.gpuCores`, {
+                defaultValue: '1',
+            });
+            resetField(`blocks.${blockIndex}.configurations.${configurationIndex}.cores`, {
+                defaultValue: '20',
+            });
+            resetField(`blocks.${blockIndex}.configurations.${configurationIndex}.memory`, {
+                defaultValue: defaultMemoryByPlatform(platform),
+            });
+            resetField(`blocks.${blockIndex}.configurations.${configurationIndex}.preemptible`, {
+                defaultValue: true,
+            });
+        }
+    }, [resetField, platform, blockIndex, configurationIndex]);
+
+    const configurationError = errors.blocks?.[blockIndex]?.configurations?.[
+        configurationIndex
+    ] as Merge<FieldError, FieldErrorsImpl<NonNullable<ComputeConfiguration>>>;
+
+    const memoryValidate = useCallback(
+        (value: string, allValues: FormFieldsValues) => {
+            const configurationValues =
+                allValues.blocks[blockIndex].configurations[configurationIndex];
+            if (!isComputeConfiguration(configurationValues)) {
+                return undefined;
+            }
+
+            if (
+                (Number(value) < 0 || Number(value) > 500) &&
+                configurationValues.platform?.includes('gpu-h100')
+            ) {
+                return 'Only 0-500 avaliable for gpu-h100 platform';
+            }
+
+            if (
+                (Number(value) < 500 || Number(value) > 1000) &&
+                configurationValues.platform?.includes('gpu-standard-v3')
+            ) {
+                return 'Only 500-1000 avaliable for gpu-standard-v3 platform';
+            }
+
+            if (
+                (Number(value) < 1000 || Number(value) > 5000) &&
+                configurationValues.platform?.includes('standard-v2')
+            ) {
+                return 'Only 1000-5000 avaliable for gpu-standard-v3 platform';
+            }
+
+            return undefined;
+        },
+        [blockIndex, configurationIndex],
+    );
+
     return (
         <React.Fragment>
             <div>
@@ -67,8 +142,10 @@ const ComputeFormFields = ({
                             value={field.value}
                             onUpdate={field.onChange}
                             options={osProducts}
+                            error={configurationError?.osProduct?.message}
                         />
                     )}
+                    rules={{validate: osAvaliable}}
                     control={control}
                     name={`blocks.${blockIndex}.configurations.${configurationIndex}.osProduct`}
                 />
@@ -85,8 +162,10 @@ const ComputeFormFields = ({
                                 content,
                                 value,
                             }))}
+                            error={configurationError?.platform?.message}
                         />
                     )}
+                    rules={{validate: required}}
                     control={control}
                     name={`blocks.${blockIndex}.configurations.${configurationIndex}.platform`}
                 />
@@ -103,6 +182,7 @@ const ComputeFormFields = ({
                                 options={gpuCoresOptions}
                             />
                         )}
+                        rules={{validate: required}}
                         control={control}
                         name={`blocks.${blockIndex}.configurations.${configurationIndex}.gpuCores`}
                     />
@@ -112,8 +192,18 @@ const ComputeFormFields = ({
                 Cores&nbsp;
                 <Controller
                     render={({field}) => (
-                        <TextInput {...field} value={field.value} onUpdate={field.onChange} />
+                        <TextInput
+                            {...field}
+                            value={field.value}
+                            onUpdate={field.onChange}
+                            error={configurationError?.cores?.message}
+                            errorMessage={configurationError?.cores?.message}
+                        />
                     )}
+                    rules={{
+                        validate: (value: string) =>
+                            composeValidators(required, mustBeNumber, minValue(1))(value),
+                    }}
                     control={control}
                     name={`blocks.${blockIndex}.configurations.${configurationIndex}.cores`}
                 />
@@ -122,8 +212,15 @@ const ComputeFormFields = ({
                 Memory&nbsp;
                 <Controller
                     render={({field}) => (
-                        <TextInput {...field} value={field.value} onUpdate={field.onChange} />
+                        <TextInput
+                            {...field}
+                            value={field.value}
+                            onUpdate={field.onChange}
+                            error={configurationError?.memory?.message}
+                            errorMessage={configurationError?.memory?.message}
+                        />
                     )}
+                    rules={{validate: memoryValidate}}
                     control={control}
                     name={`blocks.${blockIndex}.configurations.${configurationIndex}.memory`}
                 />
@@ -174,8 +271,18 @@ const ComputeFormFields = ({
                                         value={field.value}
                                         onUpdate={field.onChange}
                                         options={diskTypes}
+                                        error={
+                                            (
+                                                configurationError?.disks?.[diskIndex]
+                                                    ?.type as Merge<
+                                                    FieldError,
+                                                    FieldErrorsImpl<NonNullable<DiskType>>
+                                                >
+                                            )?.message
+                                        }
                                     />
                                 )}
+                                rules={{validate: required}}
                                 control={control}
                                 name={`blocks.${blockIndex}.configurations.${configurationIndex}.disks.${diskIndex}.type`}
                             />
@@ -188,8 +295,15 @@ const ComputeFormFields = ({
                                         {...field}
                                         value={field.value}
                                         onUpdate={field.onChange}
+                                        error={
+                                            configurationError?.disks?.[diskIndex]?.size?.message
+                                        }
+                                        errorMessage={
+                                            configurationError?.disks?.[diskIndex]?.size?.message
+                                        }
                                     />
                                 )}
+                                rules={{validate: required}}
                                 control={control}
                                 name={`blocks.${blockIndex}.configurations.${configurationIndex}.disks.${diskIndex}.size`}
                             />

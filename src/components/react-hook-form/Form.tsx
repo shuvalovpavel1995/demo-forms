@@ -24,7 +24,7 @@ export const Form = React.forwardRef<FormProps>(function FormComponent() {
         }, 100);
     }, []);
 
-    const methods = useForm<FormFieldsValues>();
+    const methods = useForm<FormFieldsValues>({mode: 'onBlur'});
 
     if (!config) {
         return <React.Fragment>Loading</React.Fragment>;

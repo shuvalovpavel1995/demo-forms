@@ -8,6 +8,7 @@ import {computeConfig} from '../../mocks/configs';
 import {sleep} from '../utils/validators';
 
 import {FormBlocks} from './FormBlocks';
+import {defaultMemoryByPlatform} from '../utils/utils';
 
 export interface FormProps {}
 
@@ -27,14 +28,13 @@ export const Form = React.forwardRef<FormProps>(function FormComponent() {
 
     const calculator = createDecorator({
         field: /blocks\[\d+\]\.configurations\[\d+\].platform/,
-        updates: (_newPlatform: string, name: string) => {
+        updates: (newPlatform: string, name: string) => {
             const fieldPath = name.replace('.platform', '');
 
             return {
-                [`${fieldPath}.coreFraction`]: '100',
                 [`${fieldPath}.gpuCores`]: '1',
                 [`${fieldPath}.cores`]: '20',
-                [`${fieldPath}.memory`]: '500',
+                [`${fieldPath}.memory`]: defaultMemoryByPlatform(newPlatform[0]),
                 [`${fieldPath}.preemptible`]: true,
             };
         },
