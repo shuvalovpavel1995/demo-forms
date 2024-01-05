@@ -17,7 +17,7 @@ export const FormBlocks = ({config}: FormBlocksProps) => {
     const form = useForm<FormFieldsValues>();
     const {values} = useFormState<FormFieldsValues>();
     const {fields} = useFieldArray<FormFieldsValues['blocks']>(`blocks`, {
-        subscription: {submitting: true, pristine: true},
+        subscription: {},
     });
 
     return (

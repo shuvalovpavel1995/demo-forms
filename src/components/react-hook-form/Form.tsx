@@ -1,12 +1,14 @@
+// eslint-disable-next-line no-restricted-syntax
 import React, {useEffect, useState} from 'react';
 
 import {FormProvider, useForm} from 'react-hook-form';
 
 import {computeConfig} from '../../mocks/configs';
+import {initialState} from '../../mocks/initial';
+import {FormFieldsValues} from '../../types';
 import {sleep} from '../utils/validators';
 
-import {FormBlocks} from './FormBlocks';
-import {FormFieldsValues} from '../../types';
+import FormBlocks from './FormBlocks';
 
 export interface FormProps {}
 
@@ -24,7 +26,7 @@ export const Form = React.forwardRef<FormProps>(function FormComponent() {
         }, 100);
     }, []);
 
-    const methods = useForm<FormFieldsValues>({mode: 'onBlur'});
+    const methods = useForm<FormFieldsValues>({mode: 'onBlur', defaultValues: initialState});
 
     if (!config) {
         return <React.Fragment>Loading</React.Fragment>;

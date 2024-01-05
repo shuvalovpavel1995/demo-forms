@@ -6,6 +6,7 @@ import {useFieldArray} from 'react-final-form-arrays';
 
 import {computeConfig} from '../../mocks/configs';
 import {ComputeConfiguration, FormFieldsValues, K8sConfiguration} from '../../types';
+import {Counter} from '../counter/Counter';
 import {block} from '../utils/cn';
 
 import {Configuration} from './Configuration';
@@ -24,7 +25,7 @@ export interface FormBlockProps {
 export const FormBlock = ({name, config, blockIndex, remove}: FormBlockProps) => {
     const {fields} = useFieldArray<K8sConfiguration | ComputeConfiguration>(
         `${name}.configurations`,
-        {subscription: {submitting: true, pristine: true}},
+        {subscription: {}},
     );
     const form = useForm<FormFieldsValues>();
 
@@ -36,6 +37,7 @@ export const FormBlock = ({name, config, blockIndex, remove}: FormBlockProps) =>
             className={b('card')}
         >
             <label>Block #{blockIndex + 1}</label>
+            <Counter />
             <Button
                 size={'l'}
                 view="flat-action"

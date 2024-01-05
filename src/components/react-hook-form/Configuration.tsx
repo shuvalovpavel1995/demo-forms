@@ -1,13 +1,16 @@
-import React from 'react';
+// eslint-disable-next-line no-restricted-syntax
+import React, {memo} from 'react';
 
-import {Card, TextInput} from '@gravity-ui/uikit';
-import {Controller, useFormContext} from 'react-hook-form';
+import {Card} from '@gravity-ui/uikit';
+import {useFormContext} from 'react-hook-form';
 
 import {computeConfig} from '../../mocks/configs';
 import {FormFieldsValues} from '../../types';
+import {Counter} from '../counter/Counter';
 import {block} from '../utils/cn';
 
 import ComputeFormView from './ComputeFormView';
+import K8SFormView from './K8SFormView';
 
 import './Form.scss';
 
@@ -19,12 +22,13 @@ export interface ConfigurationProps {
     config: typeof computeConfig;
 }
 
-export const Configuration = ({blockIndex, configurationIndex, config}: ConfigurationProps) => {
-    const {register, control, getValues} = useFormContext<FormFieldsValues>();
+const Configuration = ({blockIndex, configurationIndex, config}: ConfigurationProps) => {
+    const {control, getValues} = useFormContext<FormFieldsValues>();
     const type = getValues(`blocks.${blockIndex}.configurations.${configurationIndex}`).type;
 
     return (
         <Card type="container" view="outlined" className={b('card')}>
+            <Counter />
             {type === 'compute' ? (
                 <div>
                     Compute
@@ -42,17 +46,10 @@ export const Configuration = ({blockIndex, configurationIndex, config}: Configur
                 <div>
                     K8S
                     <div>
-                        Name&nbsp;
-                        <Controller
-                            render={({field}) => (
-                                <TextInput
-                                    {...field}
-                                    value={field.value}
-                                    onUpdate={field.onChange}
-                                />
-                            )}
+                        <K8SFormView
+                            blockIndex={blockIndex}
+                            configurationIndex={configurationIndex}
                             control={control}
-                            name={`blocks.${blockIndex}.configurations.${configurationIndex}.name`}
                         />
                     </div>
                 </div>
@@ -60,3 +57,5 @@ export const Configuration = ({blockIndex, configurationIndex, config}: Configur
         </Card>
     );
 };
+
+export default memo(Configuration);

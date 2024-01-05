@@ -1,3 +1,4 @@
+// eslint-disable-next-line no-restricted-syntax
 import React, {useEffect, useState} from 'react';
 
 import arrayMutators from 'final-form-arrays';
@@ -5,10 +6,11 @@ import createDecorator from 'final-form-calculate';
 import {Form as FinalForm} from 'react-final-form';
 
 import {computeConfig} from '../../mocks/configs';
+import {initialState} from '../../mocks/initial';
+import {defaultMemoryByPlatform} from '../utils/utils';
 import {sleep} from '../utils/validators';
 
 import {FormBlocks} from './FormBlocks';
-import {defaultMemoryByPlatform} from '../utils/utils';
 
 export interface FormProps {}
 
@@ -51,7 +53,8 @@ export const Form = React.forwardRef<FormProps>(function FormComponent() {
             mutators={{
                 ...arrayMutators,
             }}
-            subscription={{submitting: true, pristine: true}}
+            initialValues={initialState}
+            subscription={{}}
             render={({handleSubmit}) => {
                 return (
                     <form onSubmit={handleSubmit}>

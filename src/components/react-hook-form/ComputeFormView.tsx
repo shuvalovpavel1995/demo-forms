@@ -1,4 +1,5 @@
-import React, {useCallback, useEffect} from 'react';
+// eslint-disable-next-line no-restricted-syntax
+import React, {memo, useCallback, useEffect} from 'react';
 
 import {Button, Card, Checkbox, RadioButton, Select, TextInput} from '@gravity-ui/uikit';
 import _ from 'lodash';
@@ -19,13 +20,14 @@ import {
     Option,
     isComputeConfiguration,
 } from '../../types';
+import {Counter} from '../counter/Counter';
 import {block} from '../utils/cn';
+import {defaultMemoryByPlatform} from '../utils/utils';
 import {composeValidators, minValue, mustBeNumber, required} from '../utils/validators';
 
 import {osAvaliable} from './utils';
 
 import './Form.scss';
-import {defaultMemoryByPlatform} from '../utils/utils';
 
 const b = block('form-block');
 
@@ -133,6 +135,7 @@ const ComputeFormFields = ({
 
     return (
         <React.Fragment>
+            <Counter />
             <div>
                 OS Product&nbsp;
                 <Controller
@@ -315,4 +318,4 @@ const ComputeFormFields = ({
     );
 };
 
-export default ComputeFormFields;
+export default memo(ComputeFormFields);
